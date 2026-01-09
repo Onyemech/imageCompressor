@@ -56,7 +56,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         
         // Exists! Redirect.
         // For R2, we might want to return the public URL if configured
-        const redirectUrl = PUBLIC_URL ? `${PUBLIC_URL}/${key}` : `https://${BUCKET}.s3.${process.env.S3_REGION || 'auto'}.amazonaws.com/${key}`;
+        let redirectUrl = '';
+        if (PUBLIC_URL) {
+            redirectUrl = `${PUBLIC_URL}/${key}`;
+        } else {
+            console.warn('[Warning] S3_PUBLIC_URL is not set. Redirecting to a constructed URL that may not work for R2.');
+            redirectUrl = `https://${BUCKET}.s3.${process.env.S3_REGION || 'auto'}.amazonaws.com/${key}`;
+        }
         
         res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
         return res.redirect(301, redirectUrl);
