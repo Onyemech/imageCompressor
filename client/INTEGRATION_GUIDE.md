@@ -36,18 +36,20 @@ GET /api/optimize?url={SOURCE_IMAGE_URL}&w={WIDTH}&q={QUALITY}&f={FORMAT}&client
 https://image-compressor-f5lk.onrender.com/api/optimize?url=https%3A%2F%2Fmysite.com%2Fimg.jpg&w=1200&f=webp&client=teemplot
 ```
 
-### B. Direct File Upload (New)
+### B. Direct File Upload (Images & Video)
 
 If you need to upload a file directly from the user's device (e.g., `<input type="file" />`), use the Upload Endpoint.
 
 **Endpoint:** `POST /api/upload`
 
 **Body (FormData):**
-*   `image`: The file object (binary).
+*   `image`: The file object (binary). Supports **Images** (jpg, png, webp) and **Videos** (mp4, webm, mov).
 *   `client`: Client ID (e.g., `teemplot`).
 *   `w`: Target width (optional).
 *   `q`: Quality (optional).
 *   `f`: Format (optional).
+
+**Video Note:** Videos are automatically compressed to MP4 (h.264) or WebM (vp9) based on the `f` parameter.
 
 **Example Code (React):**
 
@@ -64,12 +66,40 @@ const handleUpload = async (file: File) => {
   });
 
   const data = await response.json();
-  console.log('Optimized Image URL:', data.url);
+  console.log('Optimized File URL:', data.url);
   return data.url;
 };
 ```
 
-### C. Using the Helper Utility (Recommended for URLs)
+### C. Deleting Files
+
+To delete a file (image or video) to free up storage, send a DELETE request.
+
+**Endpoint:** `DELETE /api/delete`
+
+**Body (JSON):**
+```json
+{
+  "key": "client/hash.webp"
+}
+```
+*OR*
+```json
+{
+  "url": "https://pub-xxx.r2.dev/client/hash.webp"
+}
+```
+
+**Example Code:**
+```typescript
+await fetch('https://image-compressor-f5lk.onrender.com/api/delete', {
+  method: 'DELETE',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ url: 'https://...' })
+});
+```
+
+### D. Using the Helper Utility (Recommended for URLs)
 
 Copy the `image-optimizer.ts` (or `image-loader.ts`) file into your project's `src/lib` directory.
 
