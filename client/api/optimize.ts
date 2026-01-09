@@ -113,6 +113,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   } catch (error) {
     console.error('Optimization error:', error);
-    return res.status(500).send('Error processing image');
+    // Return detailed error for debugging (remove in prod if sensitive)
+    return res.status(500).send(`Error processing image: ${(error as Error).message}`);
   }
 }
