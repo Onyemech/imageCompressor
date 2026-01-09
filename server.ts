@@ -70,14 +70,36 @@ app.post('/api/upload', upload.single('image'), async (req: any, res: any) => {
         const client = req.body.client || 'default';
         const width = req.body.w ? parseInt(req.body.w) : undefined;
         const quality = req.body.q ? parseInt(req.body.q) : 80;
-        const format = req.body.f || 'webp';
+        let format = req.body.f || 'webp';
 
-        // Optimize
-        const { data, info } = await optimizeImage(req.file.buffer, {
-            width,
-            quality,
-            format: format as any
-        });
+        let data: Buffer;
+        let info: { width: number; height: number; size: number; format: string };
+
+        // Check if Video
+        const isVideo = req.file.mimetype.startsWith('video/');
+
+        if (isVideo) {
+             console.log('[Upload] Processing video...');
+             // Default video format to mp4 if not specified or invalid
+             if (format !== 'webm' && format !== 'mp4') format = 'mp4';
+             
+             const result = await optimizeVideo(req.file.buffer, {
+                 width,
+                 quality,
+                 format: format as any
+             });
+             data = result.data;
+             info = result.info;
+        } else {
+            // Image
+            const result = await optimizeImage(req.file.buffer, {
+                width,
+                quality,
+                format: format as any
+            });
+            data = result.data;
+            info = result.info;
+        }
 
         // Generate Key
         const hash = crypto.createHash('md5').update(data).digest('hex');

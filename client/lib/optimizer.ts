@@ -7,8 +7,8 @@ export interface OptimizationOptions {
   format?: 'webp' | 'avif' | 'jpeg' | 'png';
 }
 
-export async function optimizeImage(buffer: Buffer, options: OptimizationOptions) {
-  let pipeline = sharp(buffer);
+export async function optimizeImage(input: Buffer | string, options: OptimizationOptions) {
+  let pipeline = sharp(input);
 
   if (options.width || options.height) {
     pipeline = pipeline.resize(options.width, options.height, {

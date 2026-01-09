@@ -23,14 +23,22 @@ export interface OptimizedVideo {
     };
 }
 
-export async function optimizeVideo(inputBuffer: Buffer, options: VideoOptimizationOptions): Promise<OptimizedVideo> {
+export async function optimizeVideo(input: Buffer | string, options: VideoOptimizationOptions): Promise<OptimizedVideo> {
     const tempDir = os.tmpdir();
-    const inputPath = path.join(tempDir, `input-${Date.now()}.mp4`);
+    let inputPath = '';
     const outputPath = path.join(tempDir, `output-${Date.now()}.${options.format || 'mp4'}`);
+    let cleanupInput = false;
 
     try {
-        // Write buffer to temp file
-        await fs.promises.writeFile(inputPath, inputBuffer);
+        if (Buffer.isBuffer(input)) {
+            // Write buffer to temp file
+            inputPath = path.join(tempDir, `input-${Date.now()}.mp4`);
+            await fs.promises.writeFile(inputPath, input);
+            cleanupInput = true;
+        } else {
+            // Use existing file path
+            inputPath = input;
+        }
 
         return new Promise((resolve, reject) => {
             let command = ffmpeg(inputPath);
@@ -100,7 +108,7 @@ export async function optimizeVideo(inputBuffer: Buffer, options: VideoOptimizat
     } finally {
         // Cleanup temp files
         try {
-            if (fs.existsSync(inputPath)) await fs.promises.unlink(inputPath);
+            if (cleanupInput && inputPath && fs.existsSync(inputPath)) await fs.promises.unlink(inputPath);
             if (fs.existsSync(outputPath)) await fs.promises.unlink(outputPath);
         } catch (e) {
             console.error('Temp file cleanup failed', e);
