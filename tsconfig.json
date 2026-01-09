@@ -28,7 +28,9 @@
     "tsBuildInfoFile": "./dist/.tsbuildinfo"
   },
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "server.ts",
+    "client/**/*"
   ],
   "exclude": [
     "node_modules",
