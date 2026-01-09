@@ -47,5 +47,7 @@ If you have photographers or designers worried about "Quality":
     *   Result: 100MB -> ~60MB. (Quality is mathematically identical, but file is still huge).
     *   **Not recommended for websites.**
 
+    wow how g
+
 **Conclusion:**
 For a website, serving a 100MB image is suicide for performance. Our service will turn that into a crisp, fast-loading ~2MB image that looks exactly the same to your users.
