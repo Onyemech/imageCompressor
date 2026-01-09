@@ -1,5 +1,11 @@
 {
   "version": 2,
+  "functions": {
+    "client/api/optimize.ts": {
+      "maxDuration": 60,
+      "memory": 1024
+    }
+  },
   "builds": [
     {
       "src": "client/api/optimize.ts",

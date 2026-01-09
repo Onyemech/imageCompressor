@@ -81,7 +81,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const response = await axios.get(url, { 
         responseType: 'arraybuffer',
         maxContentLength: 50 * 1024 * 1024, // Limit input to 50MB to prevent DoS
-        timeout: 10000 // 10s timeout
+        timeout: 8000 // 8s timeout to allow time for processing within 10s function limit
     });
     
     const buffer = Buffer.from(response.data);
