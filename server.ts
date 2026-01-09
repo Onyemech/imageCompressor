@@ -13,7 +13,14 @@ const port = process.env.PORT || 3000;
 const upload = multer({ storage: multer.memoryStorage() });
 
 // Enable CORS
-app.use(cors());
+app.use(cors({
+    origin: '*', // Allow all origins (since we don't know the exact UGlobalHorizons domain)
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+// Explicit OPTIONS handler for preflight checks
+app.options('*', cors());
 
 // Wrapper to adapt Vercel handler to Express
 const vercelToExpress = (handler: any) => async (req: express.Request, res: express.Response) => {
