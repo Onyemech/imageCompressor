@@ -1,8 +1,8 @@
-import express = require('express');
-import cors = require('cors');
+import express from 'express';
+import cors from 'cors';
 import optimizeHandler from './client/api/optimize';
 import monitorHandler from './client/api/monitor';
-import multer = require('multer');
+import multer from 'multer';
 import { optimizeImage } from './client/lib/optimizer';
 import { s3, BUCKET, PUBLIC_URL } from './client/lib/s3';
 import { PutObjectCommand } from '@aws-sdk/client-s3';

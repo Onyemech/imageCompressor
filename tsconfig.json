@@ -19,7 +19,7 @@
     "declarationMap": true,
     "sourceMap": true,
     "outDir": "./dist",
-    "rootDir": "./src",
+    "rootDir": ".",
     "removeComments": false,
     "skipLibCheck": true,
     "resolveJsonModule": true,
@@ -36,6 +36,7 @@
     "node_modules",
     "dist",
     "**/*.test.ts",
-    "**/*.spec.ts"
+    "**/*.spec.ts",
+    "client/lib/image-loader.ts"
   ]
 }

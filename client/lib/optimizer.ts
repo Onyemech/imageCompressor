@@ -1,4 +1,4 @@
-import sharp = require('sharp');
+import sharp from 'sharp';
 
 export interface OptimizationOptions {
   width?: number;
