@@ -37,6 +37,20 @@ app.get('/', (req, res) => {
     res.send('Image Compression Service is Running');
 });
 
+app.get('/api/debug-config', (req, res) => {
+    res.json({
+        status: 'ok',
+        env: {
+            S3_REGION: process.env.S3_REGION || 'not set',
+            S3_BUCKET: process.env.S3_BUCKET || 'not set',
+            S3_ENDPOINT: process.env.S3_ENDPOINT ? '(set)' : 'not set',
+            S3_PUBLIC_URL: process.env.S3_PUBLIC_URL ? process.env.S3_PUBLIC_URL : 'MISSING (This is why your images are broken)',
+            PORT: process.env.PORT,
+            NODE_ENV: process.env.NODE_ENV
+        }
+    });
+});
+
 // Map routes
 app.get('/monitor', vercelToExpress(monitorHandler));
 app.get('/api/optimize', vercelToExpress(optimizeHandler));
