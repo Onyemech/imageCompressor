@@ -2,7 +2,7 @@ import { VercelRequest, VercelResponse } from '@vercel/node';
 import axios from 'axios';
 import { optimizeImage } from '../lib/optimizer';
 import { S3Client, PutObjectCommand, HeadObjectCommand } from '@aws-sdk/client-s3';
-import crypto from 'crypto';
+import * as crypto from 'crypto';
 
 // Initialize S3 Client
 const s3 = new S3Client({

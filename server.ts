@@ -1,4 +1,4 @@
-import express from 'express';
+import express = require('express');
 import optimizeHandler from './client/api/optimize';
 import monitorHandler from './client/api/monitor';
 
