@@ -8,10 +8,10 @@ You should configure the service URL in your environment variables.
 
 ```env
 # .env
-VITE_IMAGE_SERVICE_URL=https://your-image-service.vercel.app/api/optimize
+VITE_IMAGE_SERVICE_URL=https://image-compressor-f5lk.onrender.com/api/optimize
 ```
 
-*(Replace `https://your-image-service.vercel.app` with your actual Vercel deployment URL)*
+*(This is your active Render deployment URL)*
 
 ## 2. Usage
 
@@ -33,7 +33,7 @@ GET /api/optimize?url={SOURCE_IMAGE_URL}&w={WIDTH}&q={QUALITY}&f={FORMAT}&client
 
 **Example:**
 ```
-https://your-service.vercel.app/api/optimize?url=https%3A%2F%2Fmysite.com%2Fimg.jpg&w=1200&f=webp&client=teemplot
+https://image-compressor-f5lk.onrender.com/api/optimize?url=https%3A%2F%2Fmysite.com%2Fimg.jpg&w=1200&f=webp&client=teemplot
 ```
 
 ### B. Using the Helper Utility (Recommended)
