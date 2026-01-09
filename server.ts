@@ -1,4 +1,5 @@
 import express = require('express');
+import cors = require('cors');
 import optimizeHandler from './client/api/optimize';
 import monitorHandler from './client/api/monitor';
 import multer = require('multer');
@@ -10,6 +11,9 @@ import * as crypto from 'crypto';
 const app = express();
 const port = process.env.PORT || 3000;
 const upload = multer({ storage: multer.memoryStorage() });
+
+// Enable CORS
+app.use(cors());
 
 // Wrapper to adapt Vercel handler to Express
 const vercelToExpress = (handler: any) => async (req: express.Request, res: express.Response) => {
