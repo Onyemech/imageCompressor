@@ -16,6 +16,10 @@ app.get('/health', (req, res) => {
     res.send('OK');
 });
 
+app.get('/', (req, res) => {
+    res.send('Image Compression Service is Running');
+});
+
 // Map routes
 app.get('/monitor', vercelToExpress(monitorHandler));
 app.get('/api/optimize', vercelToExpress(optimizeHandler));
