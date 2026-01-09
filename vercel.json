@@ -2,20 +2,14 @@
   "version": 2,
   "functions": {
     "client/api/optimize.ts": {
-      "maxDuration": 60,
+      "maxDuration": 10,
+      "memory": 1024
+    },
+    "client/api/monitor.ts": {
+      "maxDuration": 10,
       "memory": 1024
     }
   },
-  "builds": [
-    {
-      "src": "client/api/optimize.ts",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "client/api/monitor.ts",
-      "use": "@vercel/node"
-    }
-  ],
   "routes": [
     {
       "src": "/monitor",
