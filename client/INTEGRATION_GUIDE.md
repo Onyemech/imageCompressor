@@ -36,7 +36,40 @@ GET /api/optimize?url={SOURCE_IMAGE_URL}&w={WIDTH}&q={QUALITY}&f={FORMAT}&client
 https://image-compressor-f5lk.onrender.com/api/optimize?url=https%3A%2F%2Fmysite.com%2Fimg.jpg&w=1200&f=webp&client=teemplot
 ```
 
-### B. Using the Helper Utility (Recommended)
+### B. Direct File Upload (New)
+
+If you need to upload a file directly from the user's device (e.g., `<input type="file" />`), use the Upload Endpoint.
+
+**Endpoint:** `POST /api/upload`
+
+**Body (FormData):**
+*   `image`: The file object (binary).
+*   `client`: Client ID (e.g., `teemplot`).
+*   `w`: Target width (optional).
+*   `q`: Quality (optional).
+*   `f`: Format (optional).
+
+**Example Code (React):**
+
+```typescript
+const handleUpload = async (file: File) => {
+  const formData = new FormData();
+  formData.append('image', file);
+  formData.append('client', 'teemplot');
+  formData.append('w', '800');
+
+  const response = await fetch('https://image-compressor-f5lk.onrender.com/api/upload', {
+    method: 'POST',
+    body: formData
+  });
+
+  const data = await response.json();
+  console.log('Optimized Image URL:', data.url);
+  return data.url;
+};
+```
+
+### C. Using the Helper Utility (Recommended for URLs)
 
 Copy the `image-optimizer.ts` (or `image-loader.ts`) file into your project's `src/lib` directory.
 
