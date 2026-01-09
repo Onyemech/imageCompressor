@@ -68,6 +68,8 @@ app.post('/api/upload', upload.single('image'), async (req: any, res: any) => {
         const hash = crypto.createHash('md5').update(data).digest('hex');
         const key = `${client}/${hash}.${format}`;
 
+        console.log(`[Upload] Starting S3 upload for key: ${key}`);
+
         // Upload to S3
         await s3.send(new PutObjectCommand({
             Bucket: BUCKET,
@@ -75,8 +77,18 @@ app.post('/api/upload', upload.single('image'), async (req: any, res: any) => {
             Body: data,
             ContentType: `image/${format}`
         }));
+        
+        console.log(`[Upload] S3 upload complete for key: ${key}`);
 
-        const finalUrl = PUBLIC_URL ? `${PUBLIC_URL}/${key}` : `https://${BUCKET}.s3.${process.env.S3_REGION || 'auto'}.amazonaws.com/${key}`;
+        // Construct Public URL
+        let finalUrl = '';
+        if (PUBLIC_URL) {
+            finalUrl = `${PUBLIC_URL}/${key}`;
+        } else {
+            // Fallback warning
+            console.warn('[Warning] S3_PUBLIC_URL is not set. Returning a constructed URL that may not work for R2.');
+            finalUrl = `https://${BUCKET}.s3.${process.env.S3_REGION || 'auto'}.amazonaws.com/${key}`;
+        }
 
         res.json({
             url: finalUrl,
