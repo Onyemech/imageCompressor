@@ -31,6 +31,10 @@ app.get('/monitor', vercelToExpress(monitorHandler));
 app.get('/api/optimize', vercelToExpress(optimizeHandler));
 
 // New: Upload Endpoint
+app.get('/api/upload', (req, res) => {
+    res.status(405).send('Method Not Allowed. Please use POST to upload images.');
+});
+
 app.post('/api/upload', upload.single('image'), async (req: any, res: any) => {
     try {
         if (!req.file) {
