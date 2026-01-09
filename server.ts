@@ -4,8 +4,9 @@ import optimizeHandler from './client/api/optimize';
 import monitorHandler from './client/api/monitor';
 import multer from 'multer';
 import { optimizeImage } from './client/lib/optimizer';
+import { optimizeVideo } from './client/lib/video-optimizer';
 import { s3, BUCKET, PUBLIC_URL } from './client/lib/s3';
-import { PutObjectCommand } from '@aws-sdk/client-s3';
+import { PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import * as crypto from 'crypto';
 
 const app = express();
