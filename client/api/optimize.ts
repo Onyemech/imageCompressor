@@ -1,22 +1,9 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import axios from 'axios';
 import { optimizeImage } from '../lib/optimizer';
-import { S3Client, PutObjectCommand, HeadObjectCommand } from '@aws-sdk/client-s3';
+import { PutObjectCommand, HeadObjectCommand } from '@aws-sdk/client-s3';
+import { s3, BUCKET, PUBLIC_URL } from '../lib/s3';
 import * as crypto from 'crypto';
-
-// Initialize S3 Client
-const s3 = new S3Client({
-  region: process.env.S3_REGION || 'auto',
-  credentials: {
-    accessKeyId: process.env.S3_ACCESS_KEY_ID || '',
-    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || '',
-  },
-  endpoint: process.env.S3_ENDPOINT,
-  forcePathStyle: true, // Required for some S3 compatible services including R2
-});
-
-const BUCKET = process.env.S3_BUCKET || 'musefactory-images';
-const PUBLIC_URL = process.env.S3_PUBLIC_URL; // e.g. https://cdn.musefactory.com
 
 // Valid Client IDs (In a real app, use a database)
 const VALID_CLIENTS = ['musefactory', 'client-a', 'client-b'];
