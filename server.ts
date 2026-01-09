@@ -76,7 +76,18 @@ app.post('/api/upload', upload.single('image'), async (req: any, res: any) => {
             ContentType: `image/${format}`
         }));
 
-        const finalUrl = PUBLIC_URL ? `${PUBLIC_URL}/${key}` : `https://${BUCKET}.s3.${process.env.S3_REGION || 'auto'}.amazonaws.com/${key}`;
+        let finalUrl = '';
+        if (PUBLIC_URL) {
+            finalUrl = `${PUBLIC_URL}/${key}`;
+        } else if (process.env.S3_ENDPOINT && process.env.S3_ENDPOINT.includes('r2.cloudflarestorage.com')) {
+             // R2 is detected but no Public URL is set
+             console.warn('WARNING: S3_PUBLIC_URL is missing for R2 storage.');
+             // We return a hint instead of a broken AWS URL
+             finalUrl = `https://MISSING_S3_PUBLIC_URL/${key}`;
+        } else {
+             // Default to AWS S3 structure
+             finalUrl = `https://${BUCKET}.s3.${process.env.S3_REGION || 'auto'}.amazonaws.com/${key}`;
+        }
 
         res.json({
             url: finalUrl,
