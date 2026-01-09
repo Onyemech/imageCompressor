@@ -2,22 +2,22 @@
   "version": 2,
   "builds": [
     {
-      "src": "musefactory/api/optimize.ts",
+      "src": "client/api/optimize.ts",
       "use": "@vercel/node"
     },
     {
-      "src": "musefactory/api/monitor.ts",
+      "src": "client/api/monitor.ts",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
       "src": "/monitor",
-      "dest": "/musefactory/api/monitor.ts"
+      "dest": "/client/api/monitor.ts"
     },
     {
       "src": "/(.*)",
-      "dest": "/musefactory/api/optimize.ts"
+      "dest": "/client/api/optimize.ts"
     }
   ],
   "env": {
