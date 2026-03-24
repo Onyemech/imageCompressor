@@ -1,4 +1,4 @@
-import { VercelRequest, VercelResponse } from '@vercel/node';
+import type { VercelRequest, VercelResponse } from './vercel-types';
 import axios from 'axios';
 import { optimizeImage } from '../lib/optimizer';
 import { PutObjectCommand, HeadObjectCommand } from '@aws-sdk/client-s3';

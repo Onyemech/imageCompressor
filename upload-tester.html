@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Upload Tester</title>
+    <style>
+      body {
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+        margin: 24px;
+        line-height: 1.35;
+      }
+      .row {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      label {
+        font-weight: 600;
+      }
+      input[type="text"],
+      input[type="url"] {
+        width: min(720px, 100%);
+        padding: 8px 10px;
+      }
+      input[type="file"] {
+        width: min(720px, 100%);
+      }
+      button {
+        padding: 8px 12px;
+        cursor: pointer;
+      }
+      .card {
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        padding: 16px;
+        margin: 16px 0;
+      }
+      pre {
+        background: #0b1020;
+        color: #e7eaf0;
+        padding: 12px;
+        border-radius: 10px;
+        overflow: auto;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+      .muted {
+        color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Upload Tester (Videos + Images/Docs)</h1>
+
+    <div class="card">
+      <div class="row">
+        <label for="baseUrl">Worker Base URL</label>
+        <input id="baseUrl" type="url" value="https://cf-image-worker.sabimage.workers.dev" />
+      </div>
+      <div class="row" style="margin-top: 10px">
+        <label for="token">Bearer Token (optional)</label>
+        <input id="token" type="text" placeholder="VIDEO_UPLOAD_TOKEN value" />
+      </div>
+      <p class="muted" style="margin: 10px 0 0">
+        Video endpoints: POST /api/videos, PUT/GET /api/videos/:key
+        <br />
+        File endpoints: POST /upload (or POST /api/files), PUT/GET /api/files/:key
+      </p>
+    </div>
+
+    <div class="card">
+      <h2>Video Upload</h2>
+      <div class="row">
+        <label for="videoFile">Pick video</label>
+        <input id="videoFile" type="file" accept="video/*" />
+      </div>
+      <div class="row" style="margin-top: 10px">
+        <label for="videoKey">PUT key (optional)</label>
+        <input id="videoKey" type="text" placeholder="example.mp4 (leave empty to auto-generate)" />
+      </div>
+      <div class="row" style="margin-top: 10px">
+        <button id="btnVideoMultipart">Upload (multipart POST /api/videos)</button>
+        <button id="btnVideoPut">Upload (raw PUT /api/videos/:key)</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Image/Document Upload</h2>
+      <div class="row">
+        <label for="fileAny">Pick file</label>
+        <input id="fileAny" type="file" />
+      </div>
+      <div class="row" style="margin-top: 10px">
+        <label for="fileKey">PUT key (optional)</label>
+        <input id="fileKey" type="text" placeholder="files/my-doc.pdf or my-doc.pdf" />
+      </div>
+      <div class="row" style="margin-top: 10px">
+        <button id="btnFileUpload">Upload (multipart POST /upload)</button>
+        <button id="btnFileMultipart">Upload (multipart POST /api/files)</button>
+        <button id="btnFilePut">Upload (raw PUT /api/files/:key)</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Output</h2>
+      <pre id="out">Ready.</pre>
+      <div id="links"></div>
+    </div>
+
+    <script>
+      const $ = (id) => document.getElementById(id)
+
+      function base() {
+        const u = $("baseUrl").value.trim().replace(/\/+$/, "")
+        return u
+      }
+
+      function authHeaders() {
+        const token = $("token").value.trim()
+        if (!token) return {}
+        return { Authorization: `Bearer ${token}` }
+      }
+
+      function log(value) {
+        $("out").textContent = typeof value === "string" ? value : JSON.stringify(value, null, 2)
+      }
+
+      function addLink(label, url) {
+        const a = document.createElement("a")
+        a.href = url
+        a.target = "_blank"
+        a.rel = "noreferrer"
+        a.textContent = label
+        const div = document.createElement("div")
+        div.appendChild(a)
+        $("links").appendChild(div)
+      }
+
+      function resetLinks() {
+        $("links").innerHTML = ""
+      }
+
+      function autoKeyFromFile(file) {
+        const parts = (file.name || "").split(".")
+        const ext = parts.length > 1 ? parts[parts.length - 1].toLowerCase() : ""
+        const id = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()))
+        return ext ? `${id}.${ext}` : id
+      }
+
+      async function uploadMultipart(url, file) {
+        const fd = new FormData()
+        fd.append("file", file)
+        const res = await fetch(url, { method: "POST", body: fd, headers: { ...authHeaders() } })
+        const text = await res.text()
+        let json
+        try {
+          json = JSON.parse(text)
+        } catch {
+          json = { raw: text }
+        }
+        if (!res.ok) throw new Error(`HTTP ${res.status}: ${text}`)
+        return json
+      }
+
+      async function uploadPut(url, file) {
+        const headers = { "Content-Type": file.type || "application/octet-stream", "X-Filename": file.name, ...authHeaders() }
+        const res = await fetch(url, { method: "PUT", body: file, headers })
+        const text = await res.text()
+        let json
+        try {
+          json = JSON.parse(text)
+        } catch {
+          json = { raw: text }
+        }
+        if (!res.ok) throw new Error(`HTTP ${res.status}: ${text}`)
+        return json
+      }
+
+      $("btnVideoMultipart").onclick = async () => {
+        resetLinks()
+        const file = $("videoFile").files?.[0]
+        if (!file) return log("Pick a video file first.")
+        try {
+          const json = await uploadMultipart(`${base()}/api/videos`, file)
+          log(json)
+          if (json.url) addLink("Open uploaded video", json.url)
+        } catch (e) {
+          log(String(e))
+        }
+      }
+
+      $("btnVideoPut").onclick = async () => {
+        resetLinks()
+        const file = $("videoFile").files?.[0]
+        if (!file) return log("Pick a video file first.")
+        const key = $("videoKey").value.trim() || autoKeyFromFile(file)
+        try {
+          const json = await uploadPut(`${base()}/api/videos/${encodeURIComponent(key)}`, file)
+          log(json)
+          if (json.url) addLink("Open uploaded video", json.url)
+        } catch (e) {
+          log(String(e))
+        }
+      }
+
+      $("btnFileUpload").onclick = async () => {
+        resetLinks()
+        const file = $("fileAny").files?.[0]
+        if (!file) return log("Pick a file first.")
+        try {
+          const json = await uploadMultipart(`${base()}/upload`, file)
+          log(json)
+          if (json.url) addLink("Open uploaded file", json.url)
+        } catch (e) {
+          log(String(e))
+        }
+      }
+
+      $("btnFileMultipart").onclick = async () => {
+        resetLinks()
+        const file = $("fileAny").files?.[0]
+        if (!file) return log("Pick a file first.")
+        try {
+          const json = await uploadMultipart(`${base()}/api/files`, file)
+          log(json)
+          if (json.url) addLink("Open uploaded file", json.url)
+        } catch (e) {
+          log(String(e))
+        }
+      }
+
+      $("btnFilePut").onclick = async () => {
+        resetLinks()
+        const file = $("fileAny").files?.[0]
+        if (!file) return log("Pick a file first.")
+        const key = $("fileKey").value.trim() || autoKeyFromFile(file)
+        try {
+          const json = await uploadPut(`${base()}/api/files/${encodeURIComponent(key)}`, file)
+          log(json)
+          if (json.url) addLink("Open uploaded file", json.url)
+        } catch (e) {
+          log(String(e))
+        }
+      }
+    </script>
+  </body>
+</html>
+

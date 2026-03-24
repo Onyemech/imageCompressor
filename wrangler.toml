@@ -1,0 +1,14 @@
+name = "cf-image-worker"
+main = "workers/video-worker/src/index.ts"
+compatibility_date = "2026-03-23"
+tsconfig = "workers/video-worker/tsconfig.json"
+
+[vars]
+ALLOWED_ORIGINS = "*"
+MAX_VIDEO_BYTES = "536870912"
+PUBLIC_BASE_URL = "https://cf-image-worker.sabimage.workers.dev"
+
+[[r2_buckets]]
+binding = "VIDEO_BUCKET"
+bucket_name = "sabimage-videos"
+preview_bucket_name = "sabimage-videos-dev"

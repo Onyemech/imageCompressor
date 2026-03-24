@@ -1,4 +1,4 @@
-import { VercelRequest, VercelResponse } from '@vercel/node';
+import type { VercelRequest, VercelResponse } from './vercel-types';
 import { S3Client, ListObjectsV2Command } from '@aws-sdk/client-s3';
 
 const AUTH_CODE = "0533";
